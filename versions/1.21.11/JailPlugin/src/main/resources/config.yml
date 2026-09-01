@@ -1,0 +1,27 @@
+jail-spawn:
+  world: world
+  x: 0.0
+  y: 64.0
+  z: 0.0
+  yaw: 0.0
+  pitch: 0.0
+release-spawn:
+  world: world
+  x: 0.0
+  y: 64.0
+  z: 0.0
+  yaw: 0.0
+  pitch: 0.0
+torch-marker:
+  world: world
+  x: 0.0
+  y: 64.0
+  z: 0.0
+release-button:
+  world: world
+  x: 0.0
+  y: 64.0
+  z: 0.0
+jail-teleport:
+  enabled: true
+  max-distance: 200.0

@@ -1,0 +1,49 @@
+name: JailPlugin
+version: 1.0.0
+main: com.example.jailplugin.JailPlugin
+api-version: '1.21'
+commands:
+  jail:
+    description: Jail a player
+    usage: /jail <player> [duration]
+    permission: jailplugin.jail
+  unjail:
+    description: Release a player from jail
+    usage: /unjail <player>
+    permission: jailplugin.unjail
+  setjailspawn:
+    description: Set the jail spawn point
+    usage: /setjailspawn
+    permission: jailplugin.setjailspawn
+  setreleasespawn:
+    description: Set the release spawn point
+    usage: /setreleasespawn
+    permission: jailplugin.setreleasespawn
+  setdoorcontrol:
+    description: Set the door torch marker location
+    usage: /setdoorcontrol
+    permission: jailplugin.setdoorcontrol
+  setreleasebutton:
+    description: Place the release button and wire it to the control marker
+    usage: /setreleasebutton
+    permission: jailplugin.setreleasebutton
+  jailstatus:
+    description: Show jail status for a player
+    usage: /jailstatus <player>
+    permission: jailplugin.jailstatus
+  jailtest:
+    description: Put a player in a short admin test jail
+    usage: /jailtest <player> [seconds]
+    permission: jailplugin.jailtest
+permissions:
+  jailplugin.*:
+    default: op
+    children:
+      jailplugin.jail: true
+      jailplugin.unjail: true
+      jailplugin.setjailspawn: true
+      jailplugin.setreleasespawn: true
+      jailplugin.setdoorcontrol: true
+      jailplugin.setreleasebutton: true
+      jailplugin.jailstatus: true
+      jailplugin.jailtest: true
