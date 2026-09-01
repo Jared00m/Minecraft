@@ -34,3 +34,5 @@ Releasing with `gh` (optional)
 Notes
 - Prefer branches for working versions rather than untagged local folders — branches make CI, PRs, and merges clearer.
 - Keep RCs as draft/pre-release until verified; only publish final `vX.Y.Z` when ready.
+
+Test change
