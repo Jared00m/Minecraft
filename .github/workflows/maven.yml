@@ -19,9 +19,10 @@ jobs:
           cache: 'maven'
       - name: Determine branch and build module
         run: |
-          BRANCH="${{ github.ref_name }}"
+          # Prefer github.head_ref (PR source branch); fall back to github.ref_name (push/tag)
+          BRANCH="${{ github.head_ref }}"
           if [ -z "$BRANCH" ]; then
-            BRANCH="${{ github.head_ref }}"
+            BRANCH="${{ github.ref_name }}"
           fi
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
           echo "REF=$BRANCH"
