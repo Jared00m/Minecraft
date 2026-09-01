@@ -11,16 +11,49 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up JDK 21
+      - name: Determine branch and build module
+        run: |
+          # Prefer github.head_ref (PR source branch); fall back to github.ref_name (push/tag)
+          BRANCH="${{ github.head_ref }}"
+          if [ -z "$BRANCH" ]; then
+            BRANCH="${{ github.ref_name }}"
+          fi
+          echo "BRANCH=$BRANCH" >> $GITHUB_ENV
+          echo "REF=$BRANCH"
+          if echo "$BRANCH" | grep -q "26.2"; then
+            echo "MODULES=-pl versions/26.2/JailPlugin -am" >> $GITHUB_ENV
+            # Paper API 26+ artifacts are built with newer Java; use JDK 25 for compilation
+            echo "JAVA_VERSION=25" >> $GITHUB_ENV
+          else
+            echo "MODULES=-pl versions/1.21.11/JailPlugin -am" >> $GITHUB_ENV
+            echo "JAVA_VERSION=21" >> $GITHUB_ENV
+          fi
+          echo "JAVA_VERSION=${JAVA_VERSION:-21}"
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: ${{ env.JAVA_VERSION }}
           cache: 'maven'
       - name: Build with Maven
-        run: mvn -f parent-pom.xml -B clean package
-      - name: Upload JAR artifact
+        run: mvn -f parent-pom.xml -B $MODULES clean package
+      - name: List built targets (debug)
+        run: |
+          echo "Listing target directories"
+          ls -la versions || true
+          find versions -maxdepth 4 -type d -name target -print || true
+          find versions -type f -name "*.jar" -print || true
+      - name: Set artifact name
+        run: echo "ARTIFACT_NAME=$(echo "$BRANCH" | tr '/' '-')" >> $GITHUB_ENV
+      - name: Upload 26.2 JAR artifact
+        if: "contains(env.BRANCH, '26.2')"
         uses: actions/upload-artifact@v4
         with:
-          name: jail-plugin-1.21.11
+          name: jail-plugin-26.2-${{ env.ARTIFACT_NAME }}
+          path: versions/26.2/JailPlugin/target/*.jar
+      - name: Upload 1.21.11 JAR artifact
+        if: "!contains(env.BRANCH, '26.2')"
+        uses: actions/upload-artifact@v4
+        with:
+          name: jail-plugin-1.21.11-${{ env.ARTIFACT_NAME }}
           path: versions/1.21.11/JailPlugin/target/*.jar

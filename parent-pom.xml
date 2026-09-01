@@ -15,6 +15,7 @@
 
     <modules>
         <module>versions/1.21.11/JailPlugin</module>
+        <module>versions/26.2/JailPlugin</module>
     </modules>
 
 </project>
