@@ -17,11 +17,15 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: 'maven'
-      - name: Determine build module
+      - name: Determine branch and build module
         run: |
-          REF="${{ github.ref_name }}"
-          echo "REF=$REF"
-          if echo "$REF" | grep -q "26.2"; then
+          BRANCH="${{ github.ref_name }}"
+          if [ -z "$BRANCH" ]; then
+            BRANCH="${{ github.head_ref }}"
+          fi
+          echo "BRANCH=$BRANCH" >> $GITHUB_ENV
+          echo "REF=$BRANCH"
+          if echo "$BRANCH" | grep -q "26.2"; then
             echo "MODULES=-pl versions/26.2/JailPlugin -am" >> $GITHUB_ENV
           else
             echo "MODULES=-pl versions/1.21.11/JailPlugin -am" >> $GITHUB_ENV
@@ -35,15 +39,15 @@ jobs:
           find versions -maxdepth 4 -type d -name target -print || true
           find versions -type f -name "*.jar" -print || true
       - name: Set artifact name
-        run: echo "ARTIFACT_NAME=$(echo '${{ github.ref_name }}' | tr '/' '-')" >> $GITHUB_ENV
+        run: echo "ARTIFACT_NAME=$(echo "$BRANCH" | tr '/' '-')" >> $GITHUB_ENV
       - name: Upload 26.2 JAR artifact
-        if: "contains(github.ref, '26.2')"
+        if: "contains(env.BRANCH, '26.2')"
         uses: actions/upload-artifact@v4
         with:
           name: jail-plugin-26.2-${{ env.ARTIFACT_NAME }}
           path: versions/26.2/JailPlugin/target/*.jar
       - name: Upload 1.21.11 JAR artifact
-        if: "!contains(github.ref, '26.2')"
+        if: "!contains(env.BRANCH, '26.2')"
         uses: actions/upload-artifact@v4
         with:
           name: jail-plugin-1.21.11-${{ env.ARTIFACT_NAME }}
