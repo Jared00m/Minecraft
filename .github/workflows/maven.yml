@@ -28,11 +28,23 @@ jobs:
           fi
       - name: Build with Maven
         run: mvn -f parent-pom.xml -B $MODULES clean package
+      - name: List built targets (debug)
+        run: |
+          echo "Listing target directories"
+          ls -la versions || true
+          find versions -maxdepth 4 -type d -name target -print || true
+          find versions -type f -name "*.jar" -print || true
       - name: Set artifact name
         run: echo "ARTIFACT_NAME=$(echo '${{ github.ref_name }}' | tr '/' '-')" >> $GITHUB_ENV
-      - name: Upload JAR artifact
+      - name: Upload 26.2 JAR artifact
+        if: contains(github.ref, '26.2')
         uses: actions/upload-artifact@v4
         with:
-          # Use branch or tag name (sanitized) so artifacts reflect the current ref.
-          name: ${{ env.ARTIFACT_NAME }}
-          path: versions/**/target/*.jar
+          name: jail-plugin-26.2-${{ env.ARTIFACT_NAME }}
+          path: versions/26.2/JailPlugin/target/*.jar
+      - name: Upload 1.21.11 JAR artifact
+        if: !contains(github.ref, '26.2')
+        uses: actions/upload-artifact@v4
+        with:
+          name: jail-plugin-1.21.11-${{ env.ARTIFACT_NAME }}
+          path: versions/1.21.11/JailPlugin/target/*.jar
